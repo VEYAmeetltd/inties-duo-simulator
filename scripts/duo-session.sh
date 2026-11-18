@@ -15,6 +15,17 @@ mkdir -p "$OUT/screenshots" "$OUT/logs"
 
 summary() { echo "$*" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"; echo "$*"; }
 
+# macOS has no `timeout`; run a command and kill it after N seconds.
+with_timeout() {
+  local secs="$1"; shift
+  "$@" & local pid=$!
+  ( sleep "$secs"; kill -9 "$pid" 2>/dev/null ) & local watcher=$!
+  local rc=0
+  wait "$pid" || rc=$?
+  kill "$watcher" 2>/dev/null || true
+  return "$rc"
+}
+
 echo "::group::Select Xcode $XCODE_VERSION"
 XCODE_APP="$(ls -d /Applications/Xcode_${XCODE_VERSION}*.app 2>/dev/null | head -1 || true)"
 if [ -z "$XCODE_APP" ]; then
@@ -50,7 +61,7 @@ echo "::group::Boot the simulator"
 booted=""
 for attempt in 1 2 3; do
   xcrun simctl boot "$UDID" 2>/dev/null || true
-  if xcrun simctl bootstatus "$UDID" -b; then booted=1; break; fi
+  if with_timeout 240 xcrun simctl bootstatus "$UDID" -b; then booted=1; break; fi
   echo "Boot attempt $attempt failed; erasing the simulator and retrying."
   xcrun simctl shutdown "$UDID" 2>/dev/null || true
   sleep 5
