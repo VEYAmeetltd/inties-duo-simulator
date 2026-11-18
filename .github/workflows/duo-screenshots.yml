@@ -51,4 +51,4 @@ jobs:
         with:
           name: duo-screenshots
           path: out/
-          retention-days: 30
+          retention-days: 1
