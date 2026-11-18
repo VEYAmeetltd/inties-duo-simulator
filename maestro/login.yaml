@@ -43,3 +43,9 @@ appId: com.intiesltd.inties
 - tapOn:
     text: "Skip tutorial"
     optional: true
+# If the text taps didn't match (run 4), tap "No thanks, I'll explore myself"
+# by position on the Meet Tye card (outer display, measured from run 4).
+- tapOn:
+    point: "43%,93%"
+- waitForAnimationToEnd:
+    timeout: 4000
