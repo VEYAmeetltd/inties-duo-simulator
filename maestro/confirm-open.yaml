@@ -1,9 +1,16 @@
 appId: com.intiesltd.inties
 ---
 # After the script opens an inties:// link, iOS asks "Open in INTIES?".
-# Tap Open, then let the screen settle before the script takes its screenshots.
+# Tap Open, close the Meet Tye tutorial if it's showing, then let the screen
+# settle before the script takes its screenshots.
 - tapOn:
     text: "Open"
+    optional: true
+- tapOn:
+    text: "Skip tutorial.*"
+    optional: true
+- tapOn:
+    text: "No thanks.*"
     optional: true
 - waitForAnimationToEnd:
     timeout: 4000
