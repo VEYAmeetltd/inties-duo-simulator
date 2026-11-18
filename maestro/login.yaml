@@ -49,3 +49,12 @@ appId: com.intiesltd.inties
     point: "43%,93%"
 - waitForAnimationToEnd:
     timeout: 4000
+# The Meet Tye card sometimes appears a few seconds later (run 6), so wait and
+# tap its "No thanks" spot once more. If the card isn't there this lands on the
+# tab bar, which is harmless because each screen is opened by link afterwards.
+- waitForAnimationToEnd:
+    timeout: 8000
+- tapOn:
+    point: "43%,93%"
+- waitForAnimationToEnd:
+    timeout: 3000
