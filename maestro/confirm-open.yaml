@@ -9,5 +9,9 @@ appId: com.intiesltd.inties
 - tapOn:
     text: "Not Now"
     optional: true
+# Meet Tye tutorial: decline it so it doesn't cover the screenshots.
+- tapOn:
+    text: "No thanks, I.ll explore myself"
+    optional: true
 - waitForAnimationToEnd:
     timeout: 4000
