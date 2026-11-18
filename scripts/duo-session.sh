@@ -45,8 +45,25 @@ echo "iPhone Duo UDID: $UDID"
 echo "::endgroup::"
 
 echo "::group::Boot the simulator"
-xcrun simctl boot "$UDID" 2>/dev/null || true
-xcrun simctl bootstatus "$UDID" -b
+# A fresh simulator's first-boot "Data Migration" can fail on CI machines;
+# when it does, wipe the device and boot it again (up to 3 attempts).
+booted=""
+for attempt in 1 2 3; do
+  xcrun simctl boot "$UDID" 2>/dev/null || true
+  if xcrun simctl bootstatus "$UDID" -b; then booted=1; break; fi
+  echo "Boot attempt $attempt failed; erasing the simulator and retrying."
+  xcrun simctl shutdown "$UDID" 2>/dev/null || true
+  sleep 5
+  xcrun simctl erase "$UDID" || true
+done
+if [ -z "$booted" ]; then
+  # Data migration can report failure while the device is actually usable.
+  if xcrun simctl list devices | grep -q "$UDID) (Booted)"; then
+    echo "Boot status reported a failure, but the device is booted; continuing."
+  else
+    echo "Could not boot the iPhone Duo simulator."; exit 1
+  fi
+fi
 # Xcode 27 shows simulators in Device Hub; keyboard forwarding needs its window.
 open -a "Device Hub" 2>/dev/null || open -a Simulator 2>/dev/null || true
 sleep 10
