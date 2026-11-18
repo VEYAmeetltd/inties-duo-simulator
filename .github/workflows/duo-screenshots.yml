@@ -1,0 +1,54 @@
+name: iPhone Duo screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_url:
+        description: "Link to the INTIES simulator build (.tar.gz from Expo)"
+        required: true
+      screens:
+        description: "Screens to capture (app routes, space separated)"
+        required: false
+        default: "discover matches bookings profile settings settings/themes safety-verification help/faq whats-new system-status profile-preview"
+      xcode:
+        description: "Xcode version to use"
+        required: false
+        default: "27.2"
+
+concurrency:
+  group: duo-simulator
+  cancel-in-progress: false
+
+jobs:
+  screenshots:
+    # GitHub's Apple Silicon Mac with Xcode 27; it includes the iPhone Duo simulator.
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Capture INTIES on both iPhone Duo screens
+        env:
+          APP_URL: ${{ inputs.app_url }}
+          SCREENS: ${{ inputs.screens }}
+          XCODE_VERSION: ${{ inputs.xcode }}
+          REVIEW_EMAIL: ${{ secrets.REVIEW_EMAIL }}
+          REVIEW_PASSWORD: ${{ secrets.REVIEW_PASSWORD }}
+        run: bash scripts/duo-screens.sh
+
+      - name: Save screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: duo-screenshots
+          path: out/
+          retention-days: 30

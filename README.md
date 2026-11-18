@@ -3,7 +3,18 @@
 Runs INTIES on GitHub's iPhone Duo simulator and streams it to your browser,
 so you can test it and take iPhone Duo App Store screenshots from a Windows PC.
 
-## How to use
+## Automatic screenshots (recommended)
+
+GitHub's free Macs have no graphics card, so the live Duo view below can't draw the
+folding phone. The **iPhone Duo screenshots** workflow works without one:
+
+1. One-time: **Settings → Secrets and variables → Actions → New repository secret**,
+   add `REVIEW_PASSWORD` (the App Review demo password). Optional: `REVIEW_EMAIL`.
+2. **Actions → iPhone Duo screenshots → Run workflow**, paste the simulator build link.
+3. After ~15 minutes, download **duo-screenshots** from the run. Files are named
+   `outer-` / `inner-` (which screen) and `closed-` / `open-` (fold position).
+
+## Live viewer (needs a Mac with a GPU)
 
 1. Go to **Actions → iPhone Duo simulator → Run workflow**.
 2. Paste the **simulator build link** from Expo (a `.tar.gz` link) and pick how many minutes.
