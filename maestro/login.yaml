@@ -28,10 +28,14 @@ appId: com.intiesltd.inties
     notVisible:
       id: "login-submit"
     timeout: 60000
-# iOS may offer to save the password; decline it.
+# iOS offers to save the password in a system sheet that Maestro can't read,
+# so tap its "Not Now" button by position (outer display, measured from run 3).
+- waitForAnimationToEnd:
+    timeout: 6000
 - tapOn:
-    text: "Not Now"
-    optional: true
+    point: "28%,63%"
+- waitForAnimationToEnd:
+    timeout: 4000
 # The Meet Tye tutorial opens on first sign-in; skip it if it appears.
 - tapOn:
     text: "No thanks, I.ll explore myself"

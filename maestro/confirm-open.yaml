@@ -1,17 +1,9 @@
 appId: com.intiesltd.inties
 ---
 # After the script opens an inties:// link, iOS asks "Open in INTIES?".
-# Tap Open, clear the iCloud "Save password?" sheet if it shows, then let the
-# screen settle before the script takes its screenshots.
+# Tap Open, then let the screen settle before the script takes its screenshots.
 - tapOn:
     text: "Open"
-    optional: true
-- tapOn:
-    text: "Not Now"
-    optional: true
-# Meet Tye tutorial: decline it so it doesn't cover the screenshots.
-- tapOn:
-    text: "No thanks, I.ll explore myself"
     optional: true
 - waitForAnimationToEnd:
     timeout: 4000
