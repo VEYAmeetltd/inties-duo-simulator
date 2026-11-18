@@ -79,10 +79,30 @@ shoot() { # shoot <name>
   fi
 }
 
+SERVE_SIM_STARTED=""
+start_serve_sim() {
+  # `serve-sim fold` talks to a running serve-sim server; start one in the
+  # background (no viewer, local only).
+  [ -n "$SERVE_SIM_STARTED" ] && return 0
+  export SERVE_SIM_CONTROL=1
+  with_timeout 120 npx -y "serve-sim@${SERVE_SIM_VERSION}" --detach "$UDID" \
+    >> "$OUT/logs/fold.log" 2>&1 || echo "serve-sim --detach failed (see logs/fold.log)"
+  SERVE_SIM_STARTED=1
+  sleep 5
+}
+
 fold() { # fold <degrees>  0 = closed, 180 = open
+  start_serve_sim
+  echo "--- fold $1" >> "$OUT/logs/fold.log"
   with_timeout 60 npx -y "serve-sim@${SERVE_SIM_VERSION}" fold "$1" -d "$UDID" \
     >> "$OUT/logs/fold.log" 2>&1 || echo "fold $1 failed (see logs/fold.log)"
-  sleep 4
+  sleep 6
+}
+
+confirm_open() {
+  # Taps "Open" on the iOS link prompt (and "Not Now" on a save-password sheet).
+  with_timeout 90 maestro --device "$UDID" test maestro/confirm-open.yaml \
+    >> "$OUT/logs/maestro-open.log" 2>&1 || true
 }
 
 echo "::group::Install INTIES"
@@ -116,7 +136,9 @@ for pose in closed open; do
   for route in $SCREENS; do
     name="${pose}-$(echo "$route" | tr '/' '-')"
     xcrun simctl openurl "$UDID" "inties:///$route" >/dev/null 2>&1 || true
-    sleep 5
+    sleep 2
+    confirm_open
+    sleep 2
     shoot "$name"
   done
 done
